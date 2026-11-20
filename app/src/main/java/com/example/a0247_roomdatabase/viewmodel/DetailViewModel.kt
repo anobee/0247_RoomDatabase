@@ -1,4 +1,3 @@
-
 package com.example.a0247_roomdatabase.viewmodel
 
 import androidx.lifecycle.SavedStateHandle
@@ -11,7 +10,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 
 data class DetailSiswaUiState(
     val detailSiswa: DetailSiswa = DetailSiswa()
@@ -39,12 +37,10 @@ class DetailViewModel(
                 initialValue = DetailSiswaUiState()
             )
 
-    fun deleteSiswa() {
-        viewModelScope.launch {
-            repositoriSiswa.deleteSiswa(
-                uiDetailState.value.detailSiswa.toSiswa()
-            )
-        }
+    suspend fun deleteSiswa() {
+        repositoriSiswa.deleteSiswa(
+            uiDetailState.value.detailSiswa.toSiswa()
+        )
     }
 
     companion object {

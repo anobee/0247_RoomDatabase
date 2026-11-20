@@ -1,6 +1,6 @@
-
 package com.example.a0247_roomdatabase.view
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,19 +12,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -33,7 +40,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-
 import com.example.a0247_roomdatabase.R
 import com.example.a0247_roomdatabase.room.Siswa
 import com.example.a0247_roomdatabase.view.route.DestinasiHome
@@ -46,11 +52,14 @@ import com.example.a0247_roomdatabase.viewmodel.PenyediaViewModel
 fun HomeScreen(
     navigateToItemEntry: () -> Unit,
     modifier: Modifier = Modifier,
+    onDetailClick: (Int) -> Unit = {},
+    navigateToItemUpdate: (Int) -> Unit = onDetailClick,
     viewModel: HomeViewModel = viewModel(
         factory = PenyediaViewModel.Factory
     )
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    var siswaToDelete by remember { mutableStateOf<Siswa?>(null) }
 
     Scaffold(
         modifier = modifier.nestedScroll(
@@ -83,17 +92,33 @@ fun HomeScreen(
 
         BodyHome(
             itemSiswa = uiStateSiswa.listSiswa,
+            onSiswaClick = navigateToItemUpdate,
+            onDeleteClick = { siswa -> siswaToDelete = siswa },
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
         )
+
+        siswaToDelete?.let { siswa ->
+            DeleteConfirmationDialog(
+                onDeleteConfirm = {
+                    viewModel.deleteSiswa(siswa)
+                    siswaToDelete = null
+                },
+                onDeleteCancel = {
+                    siswaToDelete = null
+                }
+            )
+        }
     }
 }
 
 @Composable
 fun BodyHome(
     itemSiswa: List<Siswa>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSiswaClick: (Int) -> Unit = {},
+    onDeleteClick: (Siswa) -> Unit = {}
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -108,6 +133,8 @@ fun BodyHome(
         } else {
             ListSiswa(
                 itemSiswa = itemSiswa,
+                onSiswaClick = onSiswaClick,
+                onDeleteClick = onDeleteClick,
                 modifier = Modifier.padding(
                     horizontal = dimensionResource(id = R.dimen.padding_small)
                 )
@@ -119,7 +146,9 @@ fun BodyHome(
 @Composable
 fun ListSiswa(
     itemSiswa: List<Siswa>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onSiswaClick: (Int) -> Unit = {},
+    onDeleteClick: (Siswa) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -130,9 +159,10 @@ fun ListSiswa(
         ) { person ->
             DataSiswa(
                 siswa = person,
-                modifier = Modifier.padding(
-                    dimensionResource(id = R.dimen.padding_small)
-                )
+                modifier = Modifier
+                    .padding(dimensionResource(id = R.dimen.padding_small))
+                    .clickable { onSiswaClick(person.id) },
+                onDeleteClick = { onDeleteClick(person) }
             )
         }
     }
@@ -141,7 +171,8 @@ fun ListSiswa(
 @Composable
 fun DataSiswa(
     siswa: Siswa,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onDeleteClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier,
@@ -158,7 +189,8 @@ fun DataSiswa(
             )
         ) {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = siswa.nama,
@@ -176,6 +208,14 @@ fun DataSiswa(
                     text = siswa.telpon,
                     style = MaterialTheme.typography.titleMedium
                 )
+
+                IconButton(onClick = onDeleteClick) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete),
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
 
             Text(
@@ -184,4 +224,32 @@ fun DataSiswa(
             )
         }
     }
+}
+
+@Composable
+private fun DeleteConfirmationDialog(
+    onDeleteConfirm: () -> Unit,
+    onDeleteCancel: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        onDismissRequest = onDeleteCancel,
+        title = {
+            Text(stringResource(R.string.attention))
+        },
+        text = {
+            Text(stringResource(R.string.tanya))
+        },
+        modifier = modifier,
+        dismissButton = {
+            TextButton(onClick = onDeleteCancel) {
+                Text(stringResource(R.string.no))
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDeleteConfirm) {
+                Text(stringResource(R.string.yes))
+            }
+        }
+    )
 }

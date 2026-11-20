@@ -1,4 +1,3 @@
-
 package com.example.a0247_roomdatabase.view
 
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +38,7 @@ import com.example.a0247_roomdatabase.room.Siswa
 import com.example.a0247_roomdatabase.view.route.DestinasiDetailSiswa
 import com.example.a0247_roomdatabase.viewmodel.DetailViewModel
 import com.example.a0247_roomdatabase.viewmodel.DetailSiswaUiState
-import com.example.a0247_roomdatabase.viewmodel.provider.PenyediaViewModel
+import com.example.a0247_roomdatabase.viewmodel.PenyediaViewModel
 import com.example.a0247_roomdatabase.viewmodel.toSiswa
 import kotlinx.coroutines.launch
 

@@ -1,7 +1,7 @@
 package com.example.a0247_roomdatabase.view.uicontroller
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -18,10 +18,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.a0247_roomdatabase.R
-import com.example.a0247_roomdatabase.view.HomeScreen
-import com.example.a0247_roomdatabase.view.EntrySiswaScreen
 import com.example.a0247_roomdatabase.view.DetailSiswaScreen
 import com.example.a0247_roomdatabase.view.EditSiswaScreen
+import com.example.a0247_roomdatabase.view.EntrySiswaScreen
+import com.example.a0247_roomdatabase.view.HomeScreen
+import com.example.a0247_roomdatabase.view.route.DestinasiDetailSiswa
+import com.example.a0247_roomdatabase.view.route.DestinasiEditSiswa
 import com.example.a0247_roomdatabase.view.route.DestinasiEntry
 import com.example.a0247_roomdatabase.view.route.DestinasiHome
 
@@ -51,7 +53,7 @@ fun SiswaTopAppBar(
             if (canNavigateBack) {
                 IconButton(onClick = navigateUp) {
                     Icon(
-                        imageVector = Icons.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = stringResource(
                             id = R.string.back
                         )
@@ -77,9 +79,9 @@ fun HostNavigasi(
                 navigateToItemEntry = {
                     navController.navigate(DestinasiEntry.route)
                 },
-                navigateToItemUpdate = {
+                navigateToItemUpdate = { id ->
                     navController.navigate(
-                        "${DestinasiDetailSiswa.route}/$it"
+                        "${DestinasiDetailSiswa.route}/$id"
                     )
                 }
             )
@@ -104,6 +106,9 @@ fun HostNavigasi(
             DetailSiswaScreen(
                 navigateBack = {
                     navController.navigateUp()
+                },
+                navigateToEdit = { id ->
+                    navController.navigate("${DestinasiEditSiswa.route}/$id")
                 }
             )
         }
