@@ -1,4 +1,4 @@
-package com.example.a0247_roomdatabase.uicontroller
+package com.example.a0247_roomdatabase.view.route
 
 interface DestinasiNavigasi {
     val route : String
